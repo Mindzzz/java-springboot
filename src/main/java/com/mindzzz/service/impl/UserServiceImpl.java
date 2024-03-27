@@ -65,6 +65,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         String cacheCode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_KEY + phone);
         String code = loginForm.getCode();
+        String password = loginForm.getPassword();
+
+        if(password!=null){
+            User user1 = query().eq("phone", phone).one();
+            if(user1==null)
+                return Result.fail("用户不存在");
+            if(user1.getPassword().equals(password)){
+                String token = UUID.randomUUID().toString(true);
+
+                UserDTO userDTO = BeanUtil.copyProperties(user1, UserDTO.class);
+                //session.setAttribute("user", BeanUtil.copyProperties(user, UserDTO.class));
+                Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(),
+                        CopyOptions.create().setIgnoreNullValue(true).setFieldValueEditor((fieldNane, fieldValue) -> fieldValue.toString()));
+
+                stringRedisTemplate.opsForHash().putAll(LOGIN_USER_KEY + token, userMap);
+
+                stringRedisTemplate.expire(LOGIN_USER_KEY + token, LOGIN_USER_TTL, TimeUnit.MINUTES);
+
+                return Result.ok(token);
+            }
+            else
+                return Result.fail("账号或密码错误");
+        }
+
 
         if (cacheCode == null || !cacheCode.equals(code))
             return Result.fail("验证码错误");
@@ -153,6 +177,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         User user = new User();
         user.setPhone(phone);
         user.setNickName(USER_NICK_NAME_PREFIX+RandomUtil.randomString(10));
+        user.setPassword("123456");
         save(user);
         return user;
     }
