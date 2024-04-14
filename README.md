@@ -11,7 +11,7 @@ lifeshare是一个前后端分离的项目，前端部署在nginx服务器上，
 ![image](https://github.com/Mindzzz/lifeshare/assets/100667194/0db81af6-f260-4681-8a19-d6d67a8e56b6)
 订单增加200个，未出现超卖现象和一人多单问题。
 
-尝试用rabbitMQ替换Redis的消息队列。
+用rabbitMQ替换Redis的消息队列。
 
 总结：一个挺好的熟悉Redis的spring boot项目。
 
