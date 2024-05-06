@@ -111,7 +111,7 @@ class HappyLifeApplicationTests {
             Result result2 = JSONUtil.toBean(resultJson2, Result.class);
             //获得token
             String token = result2.getData().toString();
-            //写入
+            
             osw.write(token+"\n");
         }
         //关闭输出流
